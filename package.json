@@ -1,8 +1,8 @@
 {
-  "name": "gladys-integration-template-js",
+  "name": "gladys-us-fuel-prices",
   "version": "1.0.0",
   "private": true,
-  "description": "Official starter template to build an external integration for Gladys Assistant with the JavaScript SDK.",
+  "description": "Gladys Assistant integration: weekly US gasoline and diesel prices from the EIA.",
   "type": "module",
   "main": "index.js",
   "scripts": {

@@ -32,14 +32,16 @@ pushing.
 
 ```
 index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+src/app.js                        the integration: timer, reads, states, trigger, widget, action
+src/eia.js                        EIA API v2 client (petroleum/pri/gnd): query, paging, errors, changes
+src/devices.js                    one device per EIA area: prices, weekly/yearly changes, survey date
+src/widgets.js                    dashboard widget `fuel_prices`
+src/zones.js                      the 29 EIA areas (duoarea ids) and the 4 fuels (product codes)
+src/i18n.js                       every text in en/fr/de/es
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/store.js, src/issues.js       /data persistence; failures logged once
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (mandatory)
 test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
@@ -251,3 +253,22 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Intégration US Fuel Prices (EIA)
+
+- API : `https://api.eia.gov/v2/petroleum/pri/gnd/data/`, `frequency=weekly`, `data[0]=value`,
+  facettes `duoarea` (29 zones, ids EIA, devenus les `external_id`) et `product` (`EPMR`, `EPMM`,
+  `EPMP`, `EPD2D`). Valeurs attendues en chaînes (`"3.995"`, format v2), nombres acceptés aussi :
+  à confirmer sur une vraie réponse (DEMO_KEY épuisé le 12/11). 5 000 lignes par page.
+- Le gazole n'est publié que pour `NUS`, les PADD et `SCA` : les autres zones n'ont pas de
+  fonctionnalité gazole (`ZONES[…].diesel`).
+- Variation sur un an = enquête 52 semaines (364 jours) avant, comme les tableaux de l'EIA ; lue
+  par une seconde requête (fenêtre ±7 jours), une fois par nouvelle enquête.
+- Erreurs : 403 `API_KEY_INVALID` / `API_KEY_MISSING`, 429 `OVER_RATE_LIMIT` avec `Retry-After`
+  (38 061 s observés sur `DEMO_KEY`). Le `DEMO_KEY` est limité par IP (en-tête
+  `x-ratelimit-limit: 10`) et partagé avec les autres sessions de la machine : le 12/11/2026, il
+  était épuisé avant le premier test. Ne jamais mettre l'URL dans un message d'erreur (elle porte la
+  clé).
+- Le heartbeat de `publishChangedStates` est daté par `Date.now()` du SDK, pas par l'horloge
+  injectée : un test qui le vérifie simule `Date` (`t.mock.timers`).
+- `Intl` en français écrit le signe moins en trait d'union : `formatCents` le remplace par `−`.

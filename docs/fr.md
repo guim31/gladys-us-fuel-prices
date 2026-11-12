@@ -1,67 +1,135 @@
-# Template de démonstration
+# US Fuel Prices (EIA)
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Les prix moyens hebdomadaires de l’essence et du gazole aux États-Unis dans
+Gladys, publiés par l’U.S. Energy Information Administration (EIA) : la
+moyenne nationale, les régions PADD, et les États et villes que l’EIA publie.
+
+Ce sont **des moyennes de l’enquête du lundi, pas les prix des stations** :
+l’EIA interroge un échantillon de stations chaque lundi matin et publie les
+moyennes l’après-midi même (heure de l’Est). GasBuddy et AAA ne sont pas
+utilisés : ils n’offrent pas d’API ouverte.
+
+Sans lien avec l’EIA. Développée depuis l’Europe, avec les données publiques
+de l’EIA : vos retours sont les bienvenus.
 
 ## Ce que vous obtenez
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+- Un appareil par **zone** suivie, avec pour chaque carburant (essence
+  Regular, Midgrade, Premium et gazole) : le prix en $/gal, sa variation sur
+  une semaine et sur un an (52 semaines, comme l’EIA), et la date de
+  l’enquête.
+- Un déclencheur de scène **Nouveaux prix hebdomadaires des carburants
+  (EIA)**, avec un résumé prêt pour un message.
+- Un widget de tableau de bord avec les prix de n’importe quelle zone et
+  leurs variations.
+
+## Prérequis
+
+- Gladys 5.3.0 ou plus récent.
+- Un accès à Internet depuis Gladys (`api.eia.gov`).
+- Une **clé d’API EIA** gratuite : inscrivez-vous sur
+  https://www.eia.gov/opendata/register.php (un nom et une adresse e-mail),
+  la clé arrive aussitôt par e-mail. Sans clé, l’intégration utilise
+  `DEMO_KEY`, la clé de démonstration partagée de l’EIA : elle est limitée à
+  quelques requêtes par heure et par jour, souvent déjà épuisées.
+
+## Installation
+
+Dans Gladys, ouvrez **Intégrations → Installer depuis GitHub** et saisissez
+l’adresse du dépôt : `https://github.com/guim31/gladys-us-fuel-prices`.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+| Champ           | Rôle                                                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clé d’API EIA   | Votre clé gratuite. Vide : `DEMO_KEY`. Gardée par Gladys, jamais écrite dans les journaux.                                                                                                  |
+| Zones à suivre  | Un appareil par zone : la moyenne des États-Unis (par défaut), les 5 régions PADD et 4 sous-régions, 9 États, 10 villes. Le gazole n’existe que pour le pays, les régions et la Californie. |
+| Carburants      | Les carburants affichés sur chaque appareil et dans le widget. Vide : les quatre.                                                                                                           |
+| Langue des noms | Langue des noms d’appareils et de fonctionnalités (figés à l’ajout d’un appareil), de la date de l’enquête et du résumé du déclencheur. Français par défaut.                                |
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+Ouvrez ensuite l’onglet **Découverte** de l’intégration et ajoutez les
+appareils.
 
-## Actions
+## Appareils
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+### Prix des carburants – zone
+
+| Fonctionnalité                     | Type                      | Exemple (États-Unis, 09/11/2026) |
+| ---------------------------------- | ------------------------- | -------------------------------- |
+| Ordinaire ($/gal)                  | Monnaie, dollars          | 3,995                            |
+| Ordinaire, variation sur 1 semaine | Monnaie, dollars (signée) | −0,158                           |
+| Ordinaire, variation sur 1 an      | Monnaie, dollars (signée) | 0,939                            |
+| … de même pour chaque carburant    |                           |                                  |
+| Date de l’enquête                  | Texte                     | 9 nov. 2026                      |
+
+Gladys n’a pas d’unité $/gal : la fonctionnalité de prix affiche un signe
+dollar, et son nom précise « par gallon ». Une variation de −0,158 est une
+baisse de 15,8 cents.
 
 ## Scènes
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+### Prix sous un seuil
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+Pas besoin d’un déclencheur spécial : dans une scène, choisissez **Valeur
+d’un appareil** sur la fonctionnalité de prix, par exemple « Ordinaire
+($/gal) inférieur à 3,50 ».
+
+### Une baisse de N cents
+
+Même chose sur la variation sur une semaine : « Ordinaire, variation sur 1
+semaine inférieure à −0,10 » lance la scène quand le prix a baissé de plus de
+10 cents dans la semaine.
+
+### Nouveaux prix hebdomadaires des carburants (EIA)
+
+Se déclenche une fois par semaine et par zone suivie, quand l’EIA publie une
+nouvelle enquête (jamais pour l’enquête déjà connue au démarrage de
+l’intégration). Filtre : les zones. Variables : `zone` (identifiant EIA, par
+exemple `NUS`), `zone_name`, `survey_date` (`AAAA-MM-JJ`) et `summary`, par
+exemple « Ordinaire 3,995 $ (−15,8 ¢), Gazole 6,127 $ (−16,5 ¢) », prêt pour
+un message.
 
 ## Tableau de bord
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+### Widget Carburants aux USA
+
+Réglages : la zone (n’importe laquelle, suivie ou non ; la moyenne des
+États-Unis par défaut) et l’affichage des variations. Une tuile par
+carburant, verte quand le prix a baissé dans la semaine, orange quand il a
+monté ; puis les variations sur une semaine et sur un an en cents, et la date
+de l’enquête.
+
+## Actions
+
+**Tester la connexion à l’EIA** (onglet Configuration) lit tout de suite la
+dernière enquête, avec la clé de la configuration, et répond avec un prix.
+
+## Données et limites
+
+- Données hebdomadaires : l’intégration lit l’EIA toutes les 6 heures, et
+  toutes les heures à partir du lundi 21 h UTC jusqu’à la sortie de la
+  nouvelle enquête (le mardi après un jour férié fédéral). Quelques dizaines
+  de requêtes par semaine, très loin des limites d’une clé gratuite.
+- Une enquête de plus de 15 jours n’est pas affichée : mieux vaut aucune
+  valeur qu’une valeur ancienne.
+- Le gazole n’est publié que pour le pays, les régions et la Californie.
+- Certaines semaines, l’EIA retient une valeur : la fonctionnalité garde
+  alors sa dernière valeur, de même qu’une variation qui ne peut pas être
+  calculée sans elle.
+- Les prix incluent toutes les taxes.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« L’EIA refuse la clé d’API »** : vérifiez la clé (recopiez-la depuis
+  l’e-mail), puis lancez **Tester la connexion à l’EIA**.
+- **« La limite de la clé de démonstration de l’EIA est atteinte »** :
+  saisissez votre propre clé gratuite.
+- **Aucune valeur** : ajoutez d’abord les appareils dans l’onglet
+  Découverte ; les valeurs arrivent dans la minute.
+- Plus de détails dans les journaux de l’intégration (`LOG_LEVEL=debug`).
+
+## Crédits
+
+Données : U.S. Energy Information Administration, Open Data API v2
+(`petroleum/pri/gnd`), domaine public (œuvre du gouvernement américain).
+Intégration sous licence Apache 2.0.
