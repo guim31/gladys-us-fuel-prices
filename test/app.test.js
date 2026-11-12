@@ -275,3 +275,42 @@ test('a device added later gets its states at once, and the widget is refreshed'
   assert.equal(world.fake.lastState(sco.feature('regular_price')), 3.746);
   assert.ok(world.fake.widgetRefreshes.length > refreshes);
 });
+
+test('the trigger is sent after the new states, so a scene reads the new prices', async (t) => {
+  const world = await createWorld();
+  t.after(() => world.app.stop());
+  await createAll(world);
+  const order = [];
+  const publish = world.gladys.publishChangedStates.bind(world.gladys);
+  t.mock.method(world.gladys, 'publishChangedStates', async (...args) => {
+    order.push('states');
+    return publish(...args);
+  });
+  const send = world.gladys.publishSceneEvent.bind(world.gladys);
+  t.mock.method(world.gladys, 'publishSceneEvent', async (...args) => {
+    order.push('event');
+    return send(...args);
+  });
+  world.eia.rows.push(...nextWeekRows());
+  world.clock.time = Date.UTC(2026, 10, 16, 22, 0, 0);
+  await world.app.tick({ force: true });
+  assert.deepEqual(order, ['states', 'event', 'event']);
+});
+
+test('an area first seen without a fresh survey announces the next one', async (t) => {
+  const world = await createWorld({ clock: createClock(START + 20 * DAY) });
+  t.after(() => world.app.stop());
+  assert.deepEqual(world.app.announced, { NUS: '2026-11-09', SCO: '2026-11-09' });
+  world.eia.rows.push(...nextWeekRows(-0.05, '2026-11-30'));
+  await world.app.tick({ force: true });
+  assert.equal(world.fake.sceneEvents.length, 2);
+});
+
+test('your own key, rate limited: the widget says so', async (t) => {
+  const world = await createWorld({ connect: false });
+  t.after(() => world.app.stop());
+  world.eia.fail = () => json(429, RATE_LIMIT, { 'retry-after': '60' });
+  await world.gladys.connect();
+  const ack = await widget(world);
+  assert.equal(ack.data.content.components[0].text, TEXT.rateLimit.en);
+});

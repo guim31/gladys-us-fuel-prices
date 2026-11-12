@@ -42,7 +42,7 @@ of the repository: `https://github.com/guim31/gladys-us-fuel-prices`.
 | Field                 | What it does                                                                                                                                                                |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | EIA API key           | Your free key. Empty: `DEMO_KEY`. Stored by Gladys, never written to the logs.                                                                                              |
-| Areas to follow       | One device per area: the U.S. average (default), the 7 PADD regions and 3 sub-regions, 9 states, 10 cities. Diesel exists only for the country, the regions and California. |
+| Areas to follow       | One device per area: the U.S. average (default), the 5 PADD regions and 4 sub-regions, 9 states, 10 cities. Diesel exists only for the country, the regions and California. |
 | Fuels                 | The fuels shown on every device and in the widget. Empty: all four.                                                                                                         |
 | Language of the names | Language of the device and feature names (frozen when a device is added), of the survey date and of the trigger summary. French by default.                                 |
 
@@ -105,7 +105,7 @@ once, with the key of the configuration, and answers with a price.
   free key.
 - A survey older than 15 days is not shown: better no value than an old one.
 - Diesel is published for the country, the regions and California only.
-- Some weeks EIA withholds a value: the feature then keeps its last value.
+- Some weeks EIA withholds a value: the feature then keeps its last value, and so does a change that cannot be computed without it.
 - The prices include all taxes.
 
 ## Troubleshooting

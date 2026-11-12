@@ -70,9 +70,11 @@ export function registerHandlers(
   /** The areas and fuels of the last successful read. */
   let readKey = null;
   let attemptAt = -Infinity;
-  /** The last failure: `{ kind: 'failing' | 'badKey' | 'demoLimit', retryAt }`. */
+  /** The last failure: `{ kind: 'failing' | 'badKey' | 'demoLimit' | 'rateLimit', retryAt }`. */
   let failure = null;
   const widgetZones = new Map();
+  /** Trigger events of the last read, sent once its states are published. */
+  let pendingEvents = [];
   let lastStatus = null;
   let firstRead = true;
   let timer = null;
@@ -153,7 +155,7 @@ export function registerHandlers(
       if (changed) {
         logger.debug(`EIA survey ${survey.period}: ${JSON.stringify(survey.zones)}`);
       }
-      await announce();
+      pendingEvents.push(...announce());
       return true;
     } catch (err) {
       const eia = err instanceof EiaError ? err : new EiaError(err.message);
@@ -163,7 +165,7 @@ export function registerHandlers(
         kind = 'badKey';
         wait = REFRESH_MS;
       } else if (eia.rateLimited) {
-        kind = config.usesDemoKey ? 'demoLimit' : 'failing';
+        kind = config.usesDemoKey ? 'demoLimit' : 'rateLimit';
         wait = Math.max(FAILURE_RETRY_MS, Math.min(eia.retryAfterMs ?? 0, DAY_MS));
       }
       failure = { kind, retryAt: attemptAt + wait, error: eia };
@@ -175,16 +177,19 @@ export function registerHandlers(
   // --- The trigger ------------------------------------------------------------
 
   /**
-   * A new survey: one event per area followed. An area seen for the first time
-   * (a fresh install, a new area) is only remembered: the survey it shows is not
-   * news.
+   * A new survey: one event per area followed, returned to be sent once the
+   * states are published (a scene reading the features sees the new prices).
+   * An area seen for the first time (a fresh install, a new area) is only
+   * remembered: the survey it shows is not news.
    */
-  async function announce() {
+  function announce() {
     const announced = { ...persisted.announced };
     const events = [];
     for (const zone of config.zones) {
       const data = freshZone(survey, zone, now());
       if (!data) {
+        // Seen without a fresh survey: the next one is news.
+        announced[zone] ??= survey?.zones?.[zone]?.period ?? '';
         continue;
       }
       const fuels = Object.fromEntries(
@@ -193,6 +198,7 @@ export function registerHandlers(
           .map((fuel) => [fuel, data.fuels[fuel]]),
       );
       if (Object.keys(fuels).length === 0) {
+        announced[zone] ??= data.period;
         continue;
       }
       if (announced[zone] !== undefined && data.period > announced[zone]) {
@@ -217,7 +223,13 @@ export function registerHandlers(
       persisted.announced = announced;
       store.save(persisted);
     }
-    // Remembered even when Gladys refuses the event: never fired in a loop.
+    return events;
+  }
+
+  /** Remembered even when Gladys refuses the event: never fired in a loop. */
+  async function sendEvents() {
+    const events = pendingEvents;
+    pendingEvents = [];
     for (const event of events) {
       try {
         await gladys.publishSceneEvent(NEW_PRICES, event);
@@ -252,8 +264,9 @@ export function registerHandlers(
   }
 
   const failureText = () =>
-    ({ badKey: TEXT.badKey, demoLimit: TEXT.demoLimit })[failure?.kind] ??
-    (failure?.error?.rateLimited ? TEXT.rateLimit : TEXT.unreachable);
+    ({ badKey: TEXT.badKey, demoLimit: TEXT.demoLimit, rateLimit: TEXT.rateLimit })[
+      failure?.kind
+    ] ?? TEXT.unreachable;
 
   /** The application status of the Configuration screen, sent on change only. */
   async function reportStatus() {
@@ -301,6 +314,7 @@ export function registerHandlers(
         read = survey?.period !== before;
       }
       await publishStates();
+      await sendEvents();
       await reportStatus();
       if (read) {
         gladys.requestWidgetRefresh(WIDGET_KEY);
@@ -354,6 +368,8 @@ export function registerHandlers(
   // received before the feature existed), and the widget may show its area.
   const onDeviceAdded = async () => {
     await tick({ force: !survey && !failure });
+    // The tick may have been in flight, past its publication, when it came.
+    await publishStates();
     gladys.requestWidgetRefresh(WIDGET_KEY);
   };
   gladys.onDeviceCreated(onDeviceAdded);

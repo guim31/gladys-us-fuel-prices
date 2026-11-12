@@ -41,7 +41,7 @@ dirección del repositorio: `https://github.com/guim31/gladys-us-fuel-prices`.
 | Campo                  | Función                                                                                                                                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Clave de API de la EIA | Su clave gratuita. Vacía: `DEMO_KEY`. Guardada por Gladys, nunca escrita en los registros.                                                                                                 |
-| Zonas a seguir         | Un dispositivo por zona: el promedio de EE. UU. (por defecto), las 7 regiones PADD y 3 subregiones, 9 estados, 10 ciudades. El diésel solo existe para el país, las regiones y California. |
+| Zonas a seguir         | Un dispositivo por zona: el promedio de EE. UU. (por defecto), las 5 regiones PADD y 4 subregiones, 9 estados, 10 ciudades. El diésel solo existe para el país, las regiones y California. |
 | Carburantes            | Los carburantes mostrados en cada dispositivo y en el widget. Vacío: los cuatro.                                                                                                           |
 | Idioma de los nombres  | Idioma de los nombres de dispositivos y funciones (fijados al añadir un dispositivo), de la fecha de la encuesta y del resumen del disparador. Francés por defecto.                        |
 
@@ -111,7 +111,7 @@ variaciones en una semana y en un año en centavos, y la fecha de la encuesta.
   antiguo.
 - El diésel solo se publica para el país, las regiones y California.
 - Algunas semanas la EIA retiene un valor: la función conserva entonces su
-  último valor.
+  último valor, igual que una variación que no se puede calcular sin él.
 - Los precios incluyen todos los impuestos.
 
 ## Solución de problemas

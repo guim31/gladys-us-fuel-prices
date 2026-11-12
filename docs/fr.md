@@ -43,7 +43,7 @@ l’adresse du dépôt : `https://github.com/guim31/gladys-us-fuel-prices`.
 | Champ           | Rôle                                                                                                                                                                                        |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Clé d’API EIA   | Votre clé gratuite. Vide : `DEMO_KEY`. Gardée par Gladys, jamais écrite dans les journaux.                                                                                                  |
-| Zones à suivre  | Un appareil par zone : la moyenne des États-Unis (par défaut), les 7 régions PADD et 3 sous-régions, 9 États, 10 villes. Le gazole n’existe que pour le pays, les régions et la Californie. |
+| Zones à suivre  | Un appareil par zone : la moyenne des États-Unis (par défaut), les 5 régions PADD et 4 sous-régions, 9 États, 10 villes. Le gazole n’existe que pour le pays, les régions et la Californie. |
 | Carburants      | Les carburants affichés sur chaque appareil et dans le widget. Vide : les quatre.                                                                                                           |
 | Langue des noms | Langue des noms d’appareils et de fonctionnalités (figés à l’ajout d’un appareil), de la date de l’enquête et du résumé du déclencheur. Français par défaut.                                |
 
@@ -114,7 +114,8 @@ dernière enquête, avec la clé de la configuration, et répond avec un prix.
   valeur qu’une valeur ancienne.
 - Le gazole n’est publié que pour le pays, les régions et la Californie.
 - Certaines semaines, l’EIA retient une valeur : la fonctionnalité garde
-  alors sa dernière valeur.
+  alors sa dernière valeur, de même qu’une variation qui ne peut pas être
+  calculée sans elle.
 - Les prix incluent toutes les taxes.
 
 ## Dépannage

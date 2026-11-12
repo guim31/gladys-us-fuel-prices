@@ -40,7 +40,7 @@ export function normalizeSettings(settings = {}) {
  * @param {{ period: string, fuels: object } | null} options.data the area's fresh survey
  * @param {ReturnType<typeof normalizeSettings>} options.settings
  * @param {string[]} options.fuels the fuels followed
- * @param {'ok' | 'failing' | 'badKey' | 'demoLimit'} options.status
+ * @param {'ok' | 'failing' | 'badKey' | 'demoLimit' | 'rateLimit'} options.status
  * @param {string} options.language
  */
 export function buildWidgetContent({ data, settings, fuels, status, language }) {
@@ -96,6 +96,7 @@ export function buildWidgetContent({ data, settings, fuels, status, language }) 
       failing: TEXT.unreachable,
       badKey: TEXT.badKey,
       demoLimit: TEXT.demoLimit,
+      rateLimit: TEXT.rateLimit,
     }[status];
     components.push({ type: 'text', variant: 'body', text: pick(message, language) });
   }

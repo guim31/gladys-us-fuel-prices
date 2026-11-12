@@ -10,8 +10,8 @@ used: they offer no open API and block robots.
 
 ## Features
 
-- One device per **area**: the U.S. average, the PADD regions (East Coast, New England, Central
-  Atlantic, Lower Atlantic, Midwest, Gulf Coast, Rocky Mountain, West Coast, West Coast less
+- One device per **area**: the U.S. average, the 5 PADD regions (East Coast, Midwest, Gulf Coast, Rocky Mountain, West
+  Coast) and 4 sub-regions (New England, Central Atlantic, Lower Atlantic, West Coast less
   California), 9 states (California, Colorado, Florida, Massachusetts, Minnesota, New York, Ohio,
   Texas, Washington) and 10 cities (Boston, Chicago, Cleveland, Denver, Houston, Los Angeles,
   Miami, New York City, San Francisco, Seattle).

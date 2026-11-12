@@ -44,7 +44,7 @@ Adresse des Repositorys ein: `https://github.com/guim31/gladys-us-fuel-prices`.
 | Feld              | Wirkung                                                                                                                                                                            |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | EIA-API-Schlüssel | Dein kostenloser Schlüssel. Leer: `DEMO_KEY`. Von Gladys gespeichert, nie in den Protokollen.                                                                                      |
-| Gebiete           | Ein Gerät pro Gebiet: der US-Durchschnitt (Standard), die 7 PADD-Regionen und 3 Teilregionen, 9 Staaten, 10 Städte. Diesel gibt es nur für das Land, die Regionen und Kalifornien. |
+| Gebiete           | Ein Gerät pro Gebiet: der US-Durchschnitt (Standard), die 5 PADD-Regionen und 4 Teilregionen, 9 Staaten, 10 Städte. Diesel gibt es nur für das Land, die Regionen und Kalifornien. |
 | Kraftstoffe       | Die Kraftstoffe auf jedem Gerät und im Widget. Leer: alle vier.                                                                                                                    |
 | Sprache der Namen | Sprache der Geräte- und Funktionsnamen (beim Hinzufügen festgelegt), des Erhebungsdatums und der Zusammenfassung des Auslösers. Standard: Französisch.                             |
 
@@ -113,7 +113,8 @@ Erhebung mit dem Schlüssel der Konfiguration und antwortet mit einem Preis.
   Wert als ein alter.
 - Diesel wird nur für das Land, die Regionen und Kalifornien veröffentlicht.
 - In manchen Wochen hält die EIA einen Wert zurück: Die Funktion behält dann
-  ihren letzten Wert.
+  ihren letzten Wert, ebenso eine Änderung, die ohne ihn nicht berechnet
+  werden kann.
 - Die Preise enthalten alle Steuern.
 
 ## Fehlerbehebung
