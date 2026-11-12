@@ -1,0 +1,216 @@
+{
+  "response": {
+    "warnings": [],
+    "total": "14",
+    "dateFormat": "YYYY-MM-DD",
+    "frequency": "weekly",
+    "data": [
+      {
+        "period": "2025-11-17",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMP",
+        "product-name": "Premium Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMP_PTE_NUS_DPG",
+        "series-description": "U.S. Premium All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "4.008",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-17",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMM",
+        "product-name": "Midgrade Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMM_PTE_NUS_DPG",
+        "series-description": "U.S. Midgrade All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "3.648",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "YBOS",
+        "area-name": "BOSTON",
+        "product": "EPMR",
+        "product-name": "Regular Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMR_PTE_YBOS_DPG",
+        "series-description": "Boston Regular All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "2.969",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "SCO",
+        "area-name": "COLORADO",
+        "product": "EPMR",
+        "product-name": "Regular Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMR_PTE_SCO_DPG",
+        "series-description": "Colorado Regular All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "2.636",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "SCA",
+        "area-name": "CALIFORNIA",
+        "product": "EPMR",
+        "product-name": "Regular Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMR_PTE_SCA_DPG",
+        "series-description": "California Regular All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "4.500",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "SCA",
+        "area-name": "CALIFORNIA",
+        "product": "EPD2D",
+        "product-name": "No 2 Diesel",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMD_EPD2D_PTE_SCA_DPG",
+        "series-description": "California No 2 Diesel Retail Prices (Dollars per Gallon)",
+        "value": "4.988",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "R1X",
+        "area-name": "PADD 1A",
+        "product": "EPMR",
+        "product-name": "Regular Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMR_PTE_R1X_DPG",
+        "series-description": "Padd 1A Regular All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "2.972",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "R1X",
+        "area-name": "PADD 1A",
+        "product": "EPD2D",
+        "product-name": "No 2 Diesel",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMD_EPD2D_PTE_R1X_DPG",
+        "series-description": "Padd 1A No 2 Diesel Retail Prices (Dollars per Gallon)",
+        "value": "3.955",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMR",
+        "product-name": "Regular Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMR_PTE_NUS_DPG",
+        "series-description": "U.S. Regular All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "3.056",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMP",
+        "product-name": "Premium Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMP_PTE_NUS_DPG",
+        "series-description": "U.S. Premium All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "4.010",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMM",
+        "product-name": "Midgrade Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMM_PTE_NUS_DPG",
+        "series-description": "U.S. Midgrade All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "3.643",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-10",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPD2D",
+        "product-name": "No 2 Diesel",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMD_EPD2D_PTE_NUS_DPG",
+        "series-description": "U.S. No 2 Diesel Retail Prices (Dollars per Gallon)",
+        "value": "3.837",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-03",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMP",
+        "product-name": "Premium Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMP_PTE_NUS_DPG",
+        "series-description": "U.S. Premium All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "3.980",
+        "units": "$/GAL"
+      },
+      {
+        "period": "2025-11-03",
+        "duoarea": "NUS",
+        "area-name": "U.S.",
+        "product": "EPMM",
+        "product-name": "Midgrade Gasoline",
+        "process": "PTE",
+        "process-name": "Retail Sales",
+        "series": "EMM_EPMM_PTE_NUS_DPG",
+        "series-description": "U.S. Midgrade All Formulations Retail Prices (Dollars per Gallon)",
+        "value": "3.620",
+        "units": "$/GAL"
+      }
+    ],
+    "description": "EIA petroleum gas survey data"
+  },
+  "request": {
+    "command": "/v2/petroleum/pri/gnd/data/",
+    "params": {
+      "frequency": "weekly",
+      "data": ["value"],
+      "facets": {
+        "duoarea": ["NUS", "R1X", "SCA", "SCO", "YBOS"],
+        "product": ["EPMR", "EPMM", "EPMP", "EPD2D"]
+      },
+      "start": "2025-11-03",
+      "end": "2025-11-17",
+      "sort": [
+        {
+          "column": "period",
+          "direction": "desc"
+        }
+      ],
+      "offset": 0,
+      "length": 5000
+    }
+  },
+  "apiVersion": "2.1.11",
+  "ExcelAddInVersion": "2.1.0"
+}

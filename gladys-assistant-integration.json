@@ -1,177 +1,1143 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "US Fuel Prices (EIA)",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Weekly average gasoline and diesel prices in the U.S., by region, state and city, from the EIA.",
+    "fr": "Prix moyens hebdomadaires de l’essence et du gazole aux États-Unis, par région, État et ville (EIA).",
+    "de": "Wöchentliche Durchschnittspreise für Benzin und Diesel in den USA, je Region, Staat und Stadt (EIA).",
+    "es": "Precios medios semanales de gasolina y diésel en EE. UU., por región, estado y ciudad (EIA)."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
-  "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "docker_image": "ghcr.io/guim31/gladys-us-fuel-prices:1.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-us-fuel-prices/main/cover.png",
+  "categories": ["transport", "energy"],
+  "countries": ["US"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Open data from the EIA",
+        "fr": "Les données ouvertes de l’EIA",
+        "de": "Offene Daten der EIA",
+        "es": "Datos abiertos de la EIA"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Weekly averages of the U.S. Energy Information Administration (Monday survey), not station prices. A free API key is needed. Not affiliated with the EIA.",
+        "fr": "Moyennes hebdomadaires de l’U.S. Energy Information Administration (enquête du lundi), pas les prix des stations. Une clé d’API gratuite est nécessaire. Sans lien avec l’EIA.",
+        "de": "Wochendurchschnitte der U.S. Energy Information Administration (Erhebung vom Montag), keine Tankstellenpreise. Ein kostenloser API-Schlüssel ist nötig. Nicht mit der EIA verbunden.",
+        "es": "Promedios semanales de la U.S. Energy Information Administration (encuesta del lunes), no precios de gasolineras. Se necesita una clave de API gratuita. Sin relación con la EIA."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://www.eia.gov/opendata/register.php",
+          "label": {
+            "en": "Get a free EIA API key",
+            "fr": "Obtenir une clé d’API EIA gratuite",
+            "de": "Kostenlosen EIA-API-Schlüssel holen",
+            "es": "Obtener una clave de API de la EIA gratuita"
+          }
+        },
+        {
+          "url": "https://www.eia.gov/petroleum/gasdiesel/",
+          "label": {
+            "en": "EIA gasoline and diesel prices",
+            "fr": "Prix de l’essence et du gazole sur le site de l’EIA",
+            "de": "Benzin- und Dieselpreise der EIA",
+            "es": "Precios de gasolina y diésel de la EIA"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "api_key",
+      "type": "secret",
+      "label": {
+        "en": "EIA API key",
+        "fr": "Clé d’API EIA",
+        "de": "EIA-API-Schlüssel",
+        "es": "Clave de API de la EIA"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
+      "description": {
+        "en": "Free, sent by email right after registering. Empty: the shared demo key, quickly limited. Never written to the logs.",
+        "fr": "Gratuite, envoyée par e-mail dès l’inscription. Vide : la clé de démonstration partagée, vite limitée. Jamais écrite dans les journaux.",
+        "de": "Kostenlos, kommt direkt nach der Anmeldung per E-Mail. Leer: der geteilte Demoschlüssel, schnell begrenzt. Nie in den Protokollen.",
+        "es": "Gratuita, enviada por correo nada más registrarse. Vacía: la clave de demostración compartida, limitada enseguida. Nunca escrita en los registros."
+      },
+      "required": false
     },
     {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+      "key": "zones",
+      "type": "multi_select",
+      "label": {
+        "en": "Areas to follow",
+        "fr": "Zones à suivre",
+        "de": "Gebiete",
+        "es": "Zonas a seguir"
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
-      "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "description": {
+        "en": "One device per area: the country, the PADD regions, the states and cities EIA publishes. Diesel: country, regions and California only.",
+        "fr": "Un appareil par zone : le pays, les régions PADD, les États et villes publiés par l’EIA. Gazole : pays, régions et Californie seulement.",
+        "de": "Ein Gerät pro Gebiet: das Land, die PADD-Regionen, die Staaten und Städte der EIA. Diesel: nur Land, Regionen und Kalifornien.",
+        "es": "Un dispositivo por zona: el país, las regiones PADD, los estados y ciudades que publica la EIA. Diésel: solo país, regiones y California."
+      },
       "required": false,
-      "default": "celsius",
+      "default": ["NUS"],
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "NUS",
+          "label": {
+            "en": "U.S. average",
+            "fr": "Moyenne des États-Unis",
+            "de": "USA-Durchschnitt",
+            "es": "Promedio de EE. UU."
+          }
+        },
+        {
+          "value": "R10",
+          "label": {
+            "en": "East Coast (PADD 1)",
+            "fr": "Côte Est (PADD 1)",
+            "de": "Ostküste (PADD 1)",
+            "es": "Costa Este (PADD 1)"
+          }
+        },
+        {
+          "value": "R1X",
+          "label": {
+            "en": "New England (PADD 1A)",
+            "fr": "Nouvelle-Angleterre (PADD 1A)",
+            "de": "Neuengland (PADD 1A)",
+            "es": "Nueva Inglaterra (PADD 1A)"
+          }
+        },
+        {
+          "value": "R1Y",
+          "label": {
+            "en": "Central Atlantic (PADD 1B)",
+            "fr": "Atlantique centre (PADD 1B)",
+            "de": "Mittelatlantik (PADD 1B)",
+            "es": "Atlántico Central (PADD 1B)"
+          }
+        },
+        {
+          "value": "R1Z",
+          "label": {
+            "en": "Lower Atlantic (PADD 1C)",
+            "fr": "Atlantique sud (PADD 1C)",
+            "de": "Südatlantik (PADD 1C)",
+            "es": "Atlántico Sur (PADD 1C)"
+          }
+        },
+        {
+          "value": "R20",
+          "label": {
+            "en": "Midwest (PADD 2)",
+            "fr": "Midwest (PADD 2)",
+            "de": "Mittlerer Westen (PADD 2)",
+            "es": "Medio Oeste (PADD 2)"
+          }
+        },
+        {
+          "value": "R30",
+          "label": {
+            "en": "Gulf Coast (PADD 3)",
+            "fr": "Côte du Golfe (PADD 3)",
+            "de": "Golfküste (PADD 3)",
+            "es": "Costa del Golfo (PADD 3)"
+          }
+        },
+        {
+          "value": "R40",
+          "label": {
+            "en": "Rocky Mountain (PADD 4)",
+            "fr": "Rocheuses (PADD 4)",
+            "de": "Rocky Mountains (PADD 4)",
+            "es": "Montañas Rocosas (PADD 4)"
+          }
+        },
+        {
+          "value": "R50",
+          "label": {
+            "en": "West Coast (PADD 5)",
+            "fr": "Côte Ouest (PADD 5)",
+            "de": "Westküste (PADD 5)",
+            "es": "Costa Oeste (PADD 5)"
+          }
+        },
+        {
+          "value": "R5XCA",
+          "label": {
+            "en": "West Coast less California",
+            "fr": "Côte Ouest hors Californie",
+            "de": "Westküste ohne Kalifornien",
+            "es": "Costa Oeste sin California"
+          }
+        },
+        {
+          "value": "SCA",
+          "label": {
+            "en": "California",
+            "fr": "California",
+            "de": "California",
+            "es": "California"
+          }
+        },
+        {
+          "value": "SCO",
+          "label": {
+            "en": "Colorado",
+            "fr": "Colorado",
+            "de": "Colorado",
+            "es": "Colorado"
+          }
+        },
+        {
+          "value": "SFL",
+          "label": {
+            "en": "Florida",
+            "fr": "Florida",
+            "de": "Florida",
+            "es": "Florida"
+          }
+        },
+        {
+          "value": "SMA",
+          "label": {
+            "en": "Massachusetts",
+            "fr": "Massachusetts",
+            "de": "Massachusetts",
+            "es": "Massachusetts"
+          }
+        },
+        {
+          "value": "SMN",
+          "label": {
+            "en": "Minnesota",
+            "fr": "Minnesota",
+            "de": "Minnesota",
+            "es": "Minnesota"
+          }
+        },
+        {
+          "value": "SNY",
+          "label": {
+            "en": "New York State",
+            "fr": "New York State",
+            "de": "New York State",
+            "es": "New York State"
+          }
+        },
+        {
+          "value": "SOH",
+          "label": {
+            "en": "Ohio",
+            "fr": "Ohio",
+            "de": "Ohio",
+            "es": "Ohio"
+          }
+        },
+        {
+          "value": "STX",
+          "label": {
+            "en": "Texas",
+            "fr": "Texas",
+            "de": "Texas",
+            "es": "Texas"
+          }
+        },
+        {
+          "value": "SWA",
+          "label": {
+            "en": "Washington",
+            "fr": "Washington",
+            "de": "Washington",
+            "es": "Washington"
+          }
+        },
+        {
+          "value": "YBOS",
+          "label": {
+            "en": "Boston",
+            "fr": "Boston",
+            "de": "Boston",
+            "es": "Boston"
+          }
+        },
+        {
+          "value": "YORD",
+          "label": {
+            "en": "Chicago",
+            "fr": "Chicago",
+            "de": "Chicago",
+            "es": "Chicago"
+          }
+        },
+        {
+          "value": "YCLE",
+          "label": {
+            "en": "Cleveland",
+            "fr": "Cleveland",
+            "de": "Cleveland",
+            "es": "Cleveland"
+          }
+        },
+        {
+          "value": "YDEN",
+          "label": {
+            "en": "Denver",
+            "fr": "Denver",
+            "de": "Denver",
+            "es": "Denver"
+          }
+        },
+        {
+          "value": "Y44HO",
+          "label": {
+            "en": "Houston",
+            "fr": "Houston",
+            "de": "Houston",
+            "es": "Houston"
+          }
+        },
+        {
+          "value": "Y05LA",
+          "label": {
+            "en": "Los Angeles",
+            "fr": "Los Angeles",
+            "de": "Los Angeles",
+            "es": "Los Angeles"
+          }
+        },
+        {
+          "value": "YMIA",
+          "label": {
+            "en": "Miami",
+            "fr": "Miami",
+            "de": "Miami",
+            "es": "Miami"
+          }
+        },
+        {
+          "value": "Y35NY",
+          "label": {
+            "en": "New York City",
+            "fr": "New York City",
+            "de": "New York City",
+            "es": "New York City"
+          }
+        },
+        {
+          "value": "Y05SF",
+          "label": {
+            "en": "San Francisco",
+            "fr": "San Francisco",
+            "de": "San Francisco",
+            "es": "San Francisco"
+          }
+        },
+        {
+          "value": "Y48SE",
+          "label": {
+            "en": "Seattle",
+            "fr": "Seattle",
+            "de": "Seattle",
+            "es": "Seattle"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "fuels",
+      "type": "multi_select",
+      "label": {
+        "en": "Fuels",
+        "fr": "Carburants",
+        "de": "Kraftstoffe",
+        "es": "Carburantes"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Price, weekly and yearly change of each fuel chosen, on every device and in the widget. Empty: all four.",
+        "fr": "Prix, variation sur une semaine et sur un an de chaque carburant choisi, sur chaque appareil et dans le widget. Vide : les quatre.",
+        "de": "Preis, Änderung in einer Woche und in einem Jahr für jeden gewählten Kraftstoff, auf jedem Gerät und im Widget. Leer: alle vier.",
+        "es": "Precio, variación en una semana y en un año de cada carburante elegido, en cada dispositivo y en el widget. Vacío: los cuatro."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": ["regular", "midgrade", "premium", "diesel"],
+      "options": [
+        {
+          "value": "regular",
+          "label": {
+            "en": "Regular gasoline",
+            "fr": "Essence ordinaire (Regular)",
+            "de": "Normalbenzin (Regular)",
+            "es": "Gasolina regular"
+          }
+        },
+        {
+          "value": "midgrade",
+          "label": {
+            "en": "Midgrade gasoline",
+            "fr": "Essence intermédiaire (Midgrade)",
+            "de": "Mittelbenzin (Midgrade)",
+            "es": "Gasolina intermedia (Midgrade)"
+          }
+        },
+        {
+          "value": "premium",
+          "label": {
+            "en": "Premium gasoline",
+            "fr": "Super (Premium)",
+            "de": "Superbenzin (Premium)",
+            "es": "Gasolina premium"
+          }
+        },
+        {
+          "value": "diesel",
+          "label": {
+            "en": "Diesel",
+            "fr": "Gazole (Diesel)",
+            "de": "Diesel",
+            "es": "Diésel"
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the names",
+        "fr": "Langue des noms",
+        "de": "Sprache der Namen",
+        "es": "Idioma de los nombres"
+      },
+      "description": {
+        "en": "Names of the devices and features (frozen when a device is added), survey date and trigger texts.",
+        "fr": "Noms des appareils et fonctionnalités (figés à l’ajout d’un appareil), date de l’enquête et textes du déclencheur.",
+        "de": "Namen der Geräte und Funktionen (beim Hinzufügen festgelegt), Erhebungsdatum und Texte des Auslösers.",
+        "es": "Nombres de dispositivos y funciones (fijados al añadir un dispositivo), fecha de la encuesta y textos del disparador."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "English",
+            "de": "English",
+            "es": "English"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "Français",
+            "fr": "Français",
+            "de": "Français",
+            "es": "Français"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "Deutsch",
+            "fr": "Deutsch",
+            "de": "Deutsch",
+            "es": "Deutsch"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Español",
+            "fr": "Español",
+            "de": "Español",
+            "es": "Español"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection to EIA",
+        "fr": "Tester la connexion à l’EIA",
+        "de": "Verbindung zur EIA testen",
+        "es": "Probar la conexión con la EIA"
+      },
+      "description": {
+        "en": "Reads the latest survey now, with the key of the configuration.",
+        "fr": "Lit tout de suite la dernière enquête, avec la clé de la configuration.",
+        "de": "Liest sofort die letzte Erhebung, mit dem Schlüssel der Konfiguration.",
+        "es": "Lee ahora la última encuesta, con la clave de la configuración."
+      },
+      "timeout_seconds": 60
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "new_prices",
+      "label": {
+        "en": "New weekly fuel prices (EIA)",
+        "fr": "Nouveaux prix hebdomadaires des carburants (EIA)",
+        "de": "Neue Wochenpreise für Kraftstoff (EIA)",
+        "es": "Nuevos precios semanales de carburantes (EIA)"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "EIA publishes a new survey for a followed area, once a week. The summary lists the prices and their weekly change.",
+        "fr": "L’EIA publie une nouvelle enquête pour une zone suivie, une fois par semaine. Le résumé donne les prix et leur variation sur une semaine.",
+        "de": "Die EIA veröffentlicht eine neue Erhebung für ein verfolgtes Gebiet, einmal pro Woche. Die Zusammenfassung nennt die Preise und ihre Wochenänderung.",
+        "es": "La EIA publica una nueva encuesta para una zona seguida, una vez por semana. El resumen indica los precios y su variación semanal."
       },
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
+          "key": "zone",
           "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "label": {
+            "en": "Areas",
+            "fr": "Zones",
+            "de": "Gebiete",
+            "es": "Zonas"
+          },
+          "description": {
+            "en": "Leave empty for any followed area.",
+            "fr": "Laisser vide pour toute zone suivie.",
+            "de": "Leer lassen für jedes verfolgte Gebiet.",
+            "es": "Deje vacío para cualquier zona seguida."
+          },
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "NUS",
+              "label": {
+                "en": "U.S. average",
+                "fr": "Moyenne des États-Unis",
+                "de": "USA-Durchschnitt",
+                "es": "Promedio de EE. UU."
+              }
+            },
+            {
+              "value": "R10",
+              "label": {
+                "en": "East Coast (PADD 1)",
+                "fr": "Côte Est (PADD 1)",
+                "de": "Ostküste (PADD 1)",
+                "es": "Costa Este (PADD 1)"
+              }
+            },
+            {
+              "value": "R1X",
+              "label": {
+                "en": "New England (PADD 1A)",
+                "fr": "Nouvelle-Angleterre (PADD 1A)",
+                "de": "Neuengland (PADD 1A)",
+                "es": "Nueva Inglaterra (PADD 1A)"
+              }
+            },
+            {
+              "value": "R1Y",
+              "label": {
+                "en": "Central Atlantic (PADD 1B)",
+                "fr": "Atlantique centre (PADD 1B)",
+                "de": "Mittelatlantik (PADD 1B)",
+                "es": "Atlántico Central (PADD 1B)"
+              }
+            },
+            {
+              "value": "R1Z",
+              "label": {
+                "en": "Lower Atlantic (PADD 1C)",
+                "fr": "Atlantique sud (PADD 1C)",
+                "de": "Südatlantik (PADD 1C)",
+                "es": "Atlántico Sur (PADD 1C)"
+              }
+            },
+            {
+              "value": "R20",
+              "label": {
+                "en": "Midwest (PADD 2)",
+                "fr": "Midwest (PADD 2)",
+                "de": "Mittlerer Westen (PADD 2)",
+                "es": "Medio Oeste (PADD 2)"
+              }
+            },
+            {
+              "value": "R30",
+              "label": {
+                "en": "Gulf Coast (PADD 3)",
+                "fr": "Côte du Golfe (PADD 3)",
+                "de": "Golfküste (PADD 3)",
+                "es": "Costa del Golfo (PADD 3)"
+              }
+            },
+            {
+              "value": "R40",
+              "label": {
+                "en": "Rocky Mountain (PADD 4)",
+                "fr": "Rocheuses (PADD 4)",
+                "de": "Rocky Mountains (PADD 4)",
+                "es": "Montañas Rocosas (PADD 4)"
+              }
+            },
+            {
+              "value": "R50",
+              "label": {
+                "en": "West Coast (PADD 5)",
+                "fr": "Côte Ouest (PADD 5)",
+                "de": "Westküste (PADD 5)",
+                "es": "Costa Oeste (PADD 5)"
+              }
+            },
+            {
+              "value": "R5XCA",
+              "label": {
+                "en": "West Coast less California",
+                "fr": "Côte Ouest hors Californie",
+                "de": "Westküste ohne Kalifornien",
+                "es": "Costa Oeste sin California"
+              }
+            },
+            {
+              "value": "SCA",
+              "label": {
+                "en": "California",
+                "fr": "California",
+                "de": "California",
+                "es": "California"
+              }
+            },
+            {
+              "value": "SCO",
+              "label": {
+                "en": "Colorado",
+                "fr": "Colorado",
+                "de": "Colorado",
+                "es": "Colorado"
+              }
+            },
+            {
+              "value": "SFL",
+              "label": {
+                "en": "Florida",
+                "fr": "Florida",
+                "de": "Florida",
+                "es": "Florida"
+              }
+            },
+            {
+              "value": "SMA",
+              "label": {
+                "en": "Massachusetts",
+                "fr": "Massachusetts",
+                "de": "Massachusetts",
+                "es": "Massachusetts"
+              }
+            },
+            {
+              "value": "SMN",
+              "label": {
+                "en": "Minnesota",
+                "fr": "Minnesota",
+                "de": "Minnesota",
+                "es": "Minnesota"
+              }
+            },
+            {
+              "value": "SNY",
+              "label": {
+                "en": "New York State",
+                "fr": "New York State",
+                "de": "New York State",
+                "es": "New York State"
+              }
+            },
+            {
+              "value": "SOH",
+              "label": {
+                "en": "Ohio",
+                "fr": "Ohio",
+                "de": "Ohio",
+                "es": "Ohio"
+              }
+            },
+            {
+              "value": "STX",
+              "label": {
+                "en": "Texas",
+                "fr": "Texas",
+                "de": "Texas",
+                "es": "Texas"
+              }
+            },
+            {
+              "value": "SWA",
+              "label": {
+                "en": "Washington",
+                "fr": "Washington",
+                "de": "Washington",
+                "es": "Washington"
+              }
+            },
+            {
+              "value": "YBOS",
+              "label": {
+                "en": "Boston",
+                "fr": "Boston",
+                "de": "Boston",
+                "es": "Boston"
+              }
+            },
+            {
+              "value": "YORD",
+              "label": {
+                "en": "Chicago",
+                "fr": "Chicago",
+                "de": "Chicago",
+                "es": "Chicago"
+              }
+            },
+            {
+              "value": "YCLE",
+              "label": {
+                "en": "Cleveland",
+                "fr": "Cleveland",
+                "de": "Cleveland",
+                "es": "Cleveland"
+              }
+            },
+            {
+              "value": "YDEN",
+              "label": {
+                "en": "Denver",
+                "fr": "Denver",
+                "de": "Denver",
+                "es": "Denver"
+              }
+            },
+            {
+              "value": "Y44HO",
+              "label": {
+                "en": "Houston",
+                "fr": "Houston",
+                "de": "Houston",
+                "es": "Houston"
+              }
+            },
+            {
+              "value": "Y05LA",
+              "label": {
+                "en": "Los Angeles",
+                "fr": "Los Angeles",
+                "de": "Los Angeles",
+                "es": "Los Angeles"
+              }
+            },
+            {
+              "value": "YMIA",
+              "label": {
+                "en": "Miami",
+                "fr": "Miami",
+                "de": "Miami",
+                "es": "Miami"
+              }
+            },
+            {
+              "value": "Y35NY",
+              "label": {
+                "en": "New York City",
+                "fr": "New York City",
+                "de": "New York City",
+                "es": "New York City"
+              }
+            },
+            {
+              "value": "Y05SF",
+              "label": {
+                "en": "San Francisco",
+                "fr": "San Francisco",
+                "de": "San Francisco",
+                "es": "San Francisco"
+              }
+            },
+            {
+              "value": "Y48SE",
+              "label": {
+                "en": "Seattle",
+                "fr": "Seattle",
+                "de": "Seattle",
+                "es": "Seattle"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "zone",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
-        }
-      ]
-    }
-  ],
-  "scene_actions": [
-    {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
-      },
-      "timeout_seconds": 15,
-      "fields": [
+          "label": {
+            "en": "Area (EIA id)",
+            "fr": "Zone (identifiant EIA)",
+            "de": "Gebiet (EIA-Kennung)",
+            "es": "Zona (identificador de la EIA)"
+          }
+        },
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ],
-      "outputs": [
+          "key": "zone_name",
+          "type": "string",
+          "label": {
+            "en": "Area name",
+            "fr": "Nom de la zone",
+            "de": "Name des Gebiets",
+            "es": "Nombre de la zona"
+          }
+        },
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "survey_date",
+          "type": "string",
+          "label": {
+            "en": "Survey date (YYYY-MM-DD)",
+            "fr": "Date de l’enquête (AAAA-MM-JJ)",
+            "de": "Erhebungsdatum (JJJJ-MM-TT)",
+            "es": "Fecha de la encuesta (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Prices and weekly change",
+            "fr": "Prix et variation sur une semaine",
+            "de": "Preise und Wochenänderung",
+            "es": "Precios y variación semanal"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "fuel_prices",
+      "label": {
+        "en": "US fuel prices",
+        "fr": "Carburants aux USA",
+        "de": "Spritpreise USA",
+        "es": "Carburantes en EE. UU."
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Average gasoline and diesel prices of an area, with their weekly and yearly change.",
+        "fr": "Prix moyens de l’essence et du gazole d’une zone, avec leur variation sur une semaine et un an.",
+        "de": "Durchschnittspreise für Benzin und Diesel eines Gebiets, mit Änderung in Woche und Jahr.",
+        "es": "Precios medios de gasolina y diésel de una zona, con su variación semanal y anual."
+      },
+      "icon": "droplet",
+      "settings": [
+        {
+          "key": "zone",
+          "type": "select",
+          "label": {
+            "en": "Area",
+            "fr": "Zone",
+            "de": "Gebiet",
+            "es": "Zona"
+          },
+          "description": {
+            "en": "Any area, followed or not.",
+            "fr": "N’importe quelle zone, suivie ou non.",
+            "de": "Jedes Gebiet, verfolgt oder nicht.",
+            "es": "Cualquier zona, seguida o no."
+          },
+          "required": false,
+          "default": "NUS",
+          "options": [
+            {
+              "value": "NUS",
+              "label": {
+                "en": "U.S. average",
+                "fr": "Moyenne des États-Unis",
+                "de": "USA-Durchschnitt",
+                "es": "Promedio de EE. UU."
+              }
+            },
+            {
+              "value": "R10",
+              "label": {
+                "en": "East Coast (PADD 1)",
+                "fr": "Côte Est (PADD 1)",
+                "de": "Ostküste (PADD 1)",
+                "es": "Costa Este (PADD 1)"
+              }
+            },
+            {
+              "value": "R1X",
+              "label": {
+                "en": "New England (PADD 1A)",
+                "fr": "Nouvelle-Angleterre (PADD 1A)",
+                "de": "Neuengland (PADD 1A)",
+                "es": "Nueva Inglaterra (PADD 1A)"
+              }
+            },
+            {
+              "value": "R1Y",
+              "label": {
+                "en": "Central Atlantic (PADD 1B)",
+                "fr": "Atlantique centre (PADD 1B)",
+                "de": "Mittelatlantik (PADD 1B)",
+                "es": "Atlántico Central (PADD 1B)"
+              }
+            },
+            {
+              "value": "R1Z",
+              "label": {
+                "en": "Lower Atlantic (PADD 1C)",
+                "fr": "Atlantique sud (PADD 1C)",
+                "de": "Südatlantik (PADD 1C)",
+                "es": "Atlántico Sur (PADD 1C)"
+              }
+            },
+            {
+              "value": "R20",
+              "label": {
+                "en": "Midwest (PADD 2)",
+                "fr": "Midwest (PADD 2)",
+                "de": "Mittlerer Westen (PADD 2)",
+                "es": "Medio Oeste (PADD 2)"
+              }
+            },
+            {
+              "value": "R30",
+              "label": {
+                "en": "Gulf Coast (PADD 3)",
+                "fr": "Côte du Golfe (PADD 3)",
+                "de": "Golfküste (PADD 3)",
+                "es": "Costa del Golfo (PADD 3)"
+              }
+            },
+            {
+              "value": "R40",
+              "label": {
+                "en": "Rocky Mountain (PADD 4)",
+                "fr": "Rocheuses (PADD 4)",
+                "de": "Rocky Mountains (PADD 4)",
+                "es": "Montañas Rocosas (PADD 4)"
+              }
+            },
+            {
+              "value": "R50",
+              "label": {
+                "en": "West Coast (PADD 5)",
+                "fr": "Côte Ouest (PADD 5)",
+                "de": "Westküste (PADD 5)",
+                "es": "Costa Oeste (PADD 5)"
+              }
+            },
+            {
+              "value": "R5XCA",
+              "label": {
+                "en": "West Coast less California",
+                "fr": "Côte Ouest hors Californie",
+                "de": "Westküste ohne Kalifornien",
+                "es": "Costa Oeste sin California"
+              }
+            },
+            {
+              "value": "SCA",
+              "label": {
+                "en": "California",
+                "fr": "California",
+                "de": "California",
+                "es": "California"
+              }
+            },
+            {
+              "value": "SCO",
+              "label": {
+                "en": "Colorado",
+                "fr": "Colorado",
+                "de": "Colorado",
+                "es": "Colorado"
+              }
+            },
+            {
+              "value": "SFL",
+              "label": {
+                "en": "Florida",
+                "fr": "Florida",
+                "de": "Florida",
+                "es": "Florida"
+              }
+            },
+            {
+              "value": "SMA",
+              "label": {
+                "en": "Massachusetts",
+                "fr": "Massachusetts",
+                "de": "Massachusetts",
+                "es": "Massachusetts"
+              }
+            },
+            {
+              "value": "SMN",
+              "label": {
+                "en": "Minnesota",
+                "fr": "Minnesota",
+                "de": "Minnesota",
+                "es": "Minnesota"
+              }
+            },
+            {
+              "value": "SNY",
+              "label": {
+                "en": "New York State",
+                "fr": "New York State",
+                "de": "New York State",
+                "es": "New York State"
+              }
+            },
+            {
+              "value": "SOH",
+              "label": {
+                "en": "Ohio",
+                "fr": "Ohio",
+                "de": "Ohio",
+                "es": "Ohio"
+              }
+            },
+            {
+              "value": "STX",
+              "label": {
+                "en": "Texas",
+                "fr": "Texas",
+                "de": "Texas",
+                "es": "Texas"
+              }
+            },
+            {
+              "value": "SWA",
+              "label": {
+                "en": "Washington",
+                "fr": "Washington",
+                "de": "Washington",
+                "es": "Washington"
+              }
+            },
+            {
+              "value": "YBOS",
+              "label": {
+                "en": "Boston",
+                "fr": "Boston",
+                "de": "Boston",
+                "es": "Boston"
+              }
+            },
+            {
+              "value": "YORD",
+              "label": {
+                "en": "Chicago",
+                "fr": "Chicago",
+                "de": "Chicago",
+                "es": "Chicago"
+              }
+            },
+            {
+              "value": "YCLE",
+              "label": {
+                "en": "Cleveland",
+                "fr": "Cleveland",
+                "de": "Cleveland",
+                "es": "Cleveland"
+              }
+            },
+            {
+              "value": "YDEN",
+              "label": {
+                "en": "Denver",
+                "fr": "Denver",
+                "de": "Denver",
+                "es": "Denver"
+              }
+            },
+            {
+              "value": "Y44HO",
+              "label": {
+                "en": "Houston",
+                "fr": "Houston",
+                "de": "Houston",
+                "es": "Houston"
+              }
+            },
+            {
+              "value": "Y05LA",
+              "label": {
+                "en": "Los Angeles",
+                "fr": "Los Angeles",
+                "de": "Los Angeles",
+                "es": "Los Angeles"
+              }
+            },
+            {
+              "value": "YMIA",
+              "label": {
+                "en": "Miami",
+                "fr": "Miami",
+                "de": "Miami",
+                "es": "Miami"
+              }
+            },
+            {
+              "value": "Y35NY",
+              "label": {
+                "en": "New York City",
+                "fr": "New York City",
+                "de": "New York City",
+                "es": "New York City"
+              }
+            },
+            {
+              "value": "Y05SF",
+              "label": {
+                "en": "San Francisco",
+                "fr": "San Francisco",
+                "de": "San Francisco",
+                "es": "San Francisco"
+              }
+            },
+            {
+              "value": "Y48SE",
+              "label": {
+                "en": "Seattle",
+                "fr": "Seattle",
+                "de": "Seattle",
+                "es": "Seattle"
+              }
+            }
+          ]
+        },
+        {
+          "key": "show_changes",
+          "type": "boolean",
+          "label": {
+            "en": "Show the changes",
+            "fr": "Afficher les variations",
+            "de": "Änderungen anzeigen",
+            "es": "Mostrar las variaciones"
+          },
+          "description": {
+            "en": "Over one week and one year, in cents.",
+            "fr": "Sur une semaine et un an, en cents.",
+            "de": "In einer Woche und einem Jahr, in Cent.",
+            "es": "En una semana y un año, en centavos."
+          },
+          "required": false,
+          "default": true
+        }
+      ]
     }
   ]
 }

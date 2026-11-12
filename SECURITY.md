@@ -30,6 +30,13 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+The integration stores under `/data` only the date of the last EIA survey
+announced per area (no secret). The EIA API key is kept by Gladys in the
+integration configuration, sent only to `https://api.eia.gov` (as the
+`api_key` query parameter EIA requires) and never written to the logs; error
+messages never carry the request URL. The container only makes outgoing
+HTTPS requests to `api.eia.gov` and listens on no port.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+and the EIA API.
