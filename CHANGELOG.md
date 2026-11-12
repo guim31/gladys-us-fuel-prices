@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-12
+
 ### Added
 
 - Weekly average gasoline and diesel prices of the United States, from the
@@ -22,4 +24,5 @@ the notes of the version's GitHub Release.
 - "Test the connection to EIA" action.
 - Documentation in English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-us-fuel-prices/commits/main
+[Unreleased]: https://github.com/guim31/gladys-us-fuel-prices/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-us-fuel-prices/releases/tag/v1.0.0
